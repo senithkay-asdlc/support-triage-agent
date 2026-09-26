@@ -7,11 +7,54 @@
   "appPath": "triage-webapp",
   "entrypoint": "deployment/web-application",
   "exposure": "internet",
-  "dependencies": [
-    { "kind": "component", "name": "ticket-api", "description": "Lists and filters the ticket queue, loads ticket detail and history, and submits urgency overrides, draft edits, approvals and rejections." },
-    { "kind": "platform-resource", "name": "user-auth", "resourceType": "thunder-app" }
+  "stories": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
   ],
   "description": "The Support Agent console: a shared queue of incoming tickets with their AI-assigned urgency and drafted reply, a detail view to edit the draft or override urgency, and approve/reject actions. Holds no data of its own — every read and write goes through ticket-api.",
-  "stories": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  "skillsPinned": ["wireframes", "react-webapp", "oxygen-ui-design-system", "thunder-authentication"]
+  "dependencies": [
+    {
+      "kind": "component",
+      "name": "ticket-api",
+      "description": "Lists and filters the ticket queue, loads ticket detail and history, and submits urgency overrides, draft edits, approvals and rejections.",
+      "wiring": {
+        "endpoint": {
+          "component": "support-triage-agent-ticket-api",
+          "name": "http",
+          "visibility": "project",
+          "envBindings": {
+            "address": "TICKET_API_URL"
+          }
+        }
+      }
+    },
+    {
+      "kind": "platform-resource",
+      "name": "user-auth",
+      "resourceType": "thunder-app",
+      "wiring": {
+        "ref": "support-triage-ag-1348a372",
+        "envBindings": {
+          "client_id": "USER_AUTH_CLIENT_ID",
+          "issuer": "USER_AUTH_ISSUER",
+          "jwks_url": "USER_AUTH_JWKS_URL",
+          "resource": "USER_AUTH_RESOURCE",
+          "scopes": "USER_AUTH_SCOPES"
+        }
+      }
+    }
+  ],
+  "skillsPinned": [
+    "wireframes",
+    "react-webapp",
+    "oxygen-ui-design-system",
+    "thunder-authentication"
+  ]
 }
