@@ -27,26 +27,26 @@ edit the draft, and approves or rejects it. Signs in via SSO.
 ## User Stories
 
 1. As a Support Agent, I want tickets submitted by external systems to
- appear automatically in my queue, so that I don't have to enter them
- manually.
+appear automatically in my queue, so that I don't have to enter them
+manually.
 2. As a Support Agent, I want each incoming ticket automatically classified
- by urgency, so that I can prioritize the most critical issues first.
+by urgency, so that I can prioritize the most critical issues first.
 3. As a Support Agent, I want to see an AI-drafted reply for each ticket, so
- that I can respond quickly without writing from scratch.
+that I can respond quickly without writing from scratch.
 4. As a Support Agent, I want to edit a drafted reply before approving it,
- so that I can correct or personalize the response.
+so that I can correct or personalize the response.
 5. As a Support Agent, I want to approve a drafted reply, so that it is
- marked ready to send.
+marked ready to send.
 6. As a Support Agent, I want to reject a drafted reply and request a new
- one, so that I'm never stuck sending a draft that isn't usable.
+one, so that I'm never stuck sending a draft that isn't usable.
 7. As a Support Agent, I want to override the urgency classification when
- the agent got it wrong, so that the queue's prioritization stays
- accurate.
+the agent got it wrong, so that the queue's prioritization stays
+accurate.
 8. As a Support Agent, I want to filter and sort the ticket queue by
- urgency and status, so that I can find what to work on next.
+urgency and status, so that I can find what to work on next.
 9. As a Support Agent, I want to see a ticket's full history (submission,
- classification, draft, edits, approval/rejection), so that I can
- understand and audit how it was handled.
+classification, draft, edits, approval/rejection), so that I can
+understand and audit how it was handled.
 
 ## Product Decisions
 
@@ -82,7 +82,7 @@ reading an email inbox directly.
 ## Open Questions
 
 1. Is there a maximum response-time SLA per urgency level that the product
- should track or display against each ticket?
+should track or display against each ticket?
 
 ## Further Notes
 
