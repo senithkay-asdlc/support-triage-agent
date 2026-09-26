@@ -1,0 +1,14 @@
+# crash artefacts — never wanted, in any component
+core
+!core/
+core.[0-9]*
+hs_err_pid*.log
+replay_pid*.log
+
+/triage-agent/node_modules/
+/triage-agent/dist/
+
+/ticket-api/target/
+
+/triage-webapp/node_modules/
+/triage-webapp/dist/

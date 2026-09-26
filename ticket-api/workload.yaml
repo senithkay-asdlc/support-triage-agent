@@ -1,0 +1,36 @@
+apiVersion: openchoreo.dev/v1alpha1
+metadata:
+  name: ticket-api
+
+endpoints:
+  - name: http
+    type: HTTP
+    port: 9090
+    basePath: /
+    visibility:
+      - project
+      - internal
+      - external
+
+dependencies:
+  endpoints:
+    - component: support-triage-agent-triage-agent
+      name: http
+      visibility: project
+      envBindings:
+        address: TRIAGE_AGENT_URL
+  resources:
+    - ref: support-triage-ag-9cf114e0
+      envBindings:
+        dbname: TICKETS_DB_DBNAME
+        host: TICKETS_DB_HOST
+        password: TICKETS_DB_PASSWORD
+        port: TICKETS_DB_PORT
+        user: TICKETS_DB_USER
+    - ref: support-triage-ag-1348a372
+      envBindings:
+        client_id: USER_AUTH_CLIENT_ID
+        issuer: USER_AUTH_ISSUER
+        jwks_url: USER_AUTH_JWKS_URL
+        resource: USER_AUTH_RESOURCE
+        scopes: USER_AUTH_SCOPES
