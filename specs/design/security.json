@@ -1,0 +1,32 @@
+{
+  "version": 3,
+  "permissions": [
+    {
+      "resource": "tickets",
+      "component": "ticket-api",
+      "description": "Support tickets and their triage/approval lifecycle",
+      "actions": [
+        { "handle": "read", "description": "Every ticket in the queue, including urgency and draft reply" },
+        { "handle": "override-urgency", "description": "Change the AI-assigned urgency level" },
+        { "handle": "edit-draft", "description": "Edit the drafted reply text" },
+        { "handle": "approve", "description": "Approve a drafted reply" },
+        { "handle": "reject", "description": "Reject a drafted reply and request a new draft" }
+      ]
+    }
+  ],
+  "groups": [
+    { "name": "SupportAgents", "description": "Support team members who triage and respond to tickets" }
+  ],
+  "roles": [
+    {
+      "name": "SupportAgent",
+      "description": "Reviews the shared ticket queue, adjusts urgency and drafts, and approves or rejects replies.",
+      "stories": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "grants": ["tickets:read", "tickets:override-urgency", "tickets:edit-draft", "tickets:approve", "tickets:reject"],
+      "assignTo": ["SupportAgents"]
+    }
+  ],
+  "testUsers": [
+    { "username": "test-support-agent", "roles": ["SupportAgent"] }
+  ]
+}

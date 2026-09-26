@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "component": "triage-agent",
+  "scenarios": [
+    {
+      "id": "SC-001",
+      "criteria": ["AC-story-2", "AC-story-3"],
+      "brief": {
+        "goal": "Classify and draft a reply for a ticket where the customer says the payment gateway is completely down and they cannot process any orders.",
+        "facts": { "subject": "Payment gateway is down", "body": "Our payment gateway has been returning errors for the last hour and we cannot process any customer orders. This is costing us money every minute." },
+        "withholds": []
+      },
+      "rubric": {
+        "mustCover": [
+          { "id": "MC-1", "must": "Classifies the urgency as Critical", "weight": 2 },
+          { "id": "MC-2", "must": "Drafts a reply that references the payment gateway outage specifically, not a generic template" }
+        ],
+        "mustNot": [
+          { "id": "MN-1", "mustNot": "Invents a resolution time, refund, or fact the ticket did not state" },
+          { "id": "MN-2", "mustNot": "Classifies the urgency as Low or Medium" }
+        ]
+      }
+    },
+    {
+      "id": "SC-002",
+      "criteria": ["AC-story-2", "AC-story-3"],
+      "brief": {
+        "goal": "Classify and draft a reply for a ticket that is just a question about how to change a billing cycle, nothing broken.",
+        "facts": { "subject": "How do I change my billing cycle", "body": "I'd like to switch from monthly to annual billing. How do I do that?" },
+        "withholds": []
+      },
+      "rubric": {
+        "mustCover": [
+          { "id": "MC-1", "must": "Classifies the urgency as Low", "weight": 2 },
+          { "id": "MC-2", "must": "Drafts a reply that addresses switching from monthly to annual billing" }
+        ],
+        "mustNot": [
+          { "id": "MN-1", "mustNot": "Classifies the urgency as High or Critical" },
+          { "id": "MN-2", "mustNot": "Invents a specific price or discount the ticket did not mention" }
+        ]
+      }
+    },
+    {
+      "id": "SC-003",
+      "criteria": ["AC-story-6"],
+      "brief": {
+        "goal": "Draft a new reply for a ticket about a wrong invoice amount, after the Support Agent rejected the first draft for being too generic.",
+        "facts": { "subject": "Wrong invoice amount", "body": "My latest invoice charged me $80 but my plan is $50 a month.", "priorDraft": "Thanks for reaching out! We'll look into it." },
+        "withholds": []
+      },
+      "rubric": {
+        "mustCover": [
+          { "id": "MC-1", "must": "Writes a reply that is meaningfully different in wording from the prior generic draft", "weight": 2 },
+          { "id": "MC-2", "must": "Acknowledges the specific $80 vs $50 discrepancy" }
+        ],
+        "mustNot": [
+          { "id": "MN-1", "mustNot": "Repeats the prior draft's wording" },
+          { "id": "MN-2", "mustNot": "States that the refund or credit has already been issued" }
+        ]
+      }
+    }
+  ]
+}

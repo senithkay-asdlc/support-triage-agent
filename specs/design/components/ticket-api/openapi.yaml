@@ -1,0 +1,380 @@
+openapi: 3.0.3
+info:
+  title: Ticket API
+  version: 0.1.0
+  description: Ticket ingestion, triage queue, and approval lifecycle.
+servers:
+  - url: /
+paths:
+  /tickets:
+    post:
+      operationId: submitTicket
+      summary: Submit a new ticket (external ticketing systems)
+      security: []
+      parameters:
+        - name: X-Api-Key
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Shared ingestion credential issued to the submitting system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketSubmission'
+      responses:
+        '201':
+          description: Ticket accepted and queued for triage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Missing or invalid ticket fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Missing or invalid ingestion credential
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      operationId: listTickets
+      summary: Every ticket in the shared queue
+      security:
+        - oauth2: [tickets:read]
+      parameters:
+        - name: urgency
+          in: query
+          schema:
+            $ref: '#/components/schemas/Urgency'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TicketStatus'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: A page of tickets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                    description: total matching tickets
+                  next:
+                    type: string
+                    nullable: true
+                    description: relative URI of the next page
+                  previous:
+                    type: string
+                    nullable: true
+                    description: relative URI of the previous page
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticket'
+        '401':
+          description: Not signed in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tickets/{ticketId}:
+    get:
+      operationId: getTicket
+      summary: A ticket's current urgency, draft reply and status
+      security:
+        - oauth2: [tickets:read]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: The ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: No such ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Not signed in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tickets/{ticketId}/events:
+    get:
+      operationId: listTicketEvents
+      summary: A ticket's full history, in order
+      security:
+        - oauth2: [tickets:read]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: The ticket's events, oldest first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                    description: total events
+                  next:
+                    type: string
+                    nullable: true
+                    description: relative URI of the next page
+                  previous:
+                    type: string
+                    nullable: true
+                    description: relative URI of the previous page
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TicketEvent'
+        '404':
+          description: No such ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tickets/{ticketId}/urgency:
+    post:
+      operationId: overrideTicketUrgency
+      summary: Override the AI-assigned urgency level
+      security:
+        - oauth2: [tickets:override-urgency]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [urgency]
+              properties:
+                urgency:
+                  $ref: '#/components/schemas/Urgency'
+      responses:
+        '200':
+          description: Urgency updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: No such ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tickets/{ticketId}/draft-reply:
+    put:
+      operationId: editTicketDraftReply
+      summary: Edit the drafted reply text
+      security:
+        - oauth2: [tickets:edit-draft]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [draftReply]
+              properties:
+                draftReply:
+                  type: string
+      responses:
+        '200':
+          description: Draft reply updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: No such ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tickets/{ticketId}/approve:
+    post:
+      operationId: approveTicketDraft
+      summary: Approve the drafted reply
+      security:
+        - oauth2: [tickets:approve]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: Ticket marked approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: No such ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Ticket is not in a state that can be approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tickets/{ticketId}/reject:
+    post:
+      operationId: rejectTicketDraft
+      summary: Reject the drafted reply and request a new one
+      security:
+        - oauth2: [tickets:reject]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: Ticket marked rejected and a new draft requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: No such ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Ticket is not in a state that can be rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    TicketId:
+      name: ticketId
+      in: path
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/authorize
+          tokenUrl: /oauth2/token
+          scopes:
+            tickets:read: Every ticket in the queue
+            tickets:override-urgency: Change the AI-assigned urgency level
+            tickets:edit-draft: Edit the drafted reply text
+            tickets:approve: Approve a drafted reply
+            tickets:reject: Reject a drafted reply and request a new draft
+  schemas:
+    Urgency:
+      type: string
+      enum: [Low, Medium, High, Critical]
+    TicketStatus:
+      type: string
+      enum: [new, triaged, approved, rejected]
+    TicketSubmission:
+      type: object
+      required: [subject, body]
+      properties:
+        subject:
+          type: string
+        body:
+          type: string
+        sourceSystem:
+          type: string
+          description: Name of the submitting external system
+    Ticket:
+      type: object
+      required: [id, subject, body, urgency, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        sourceSystem:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        urgency:
+          $ref: '#/components/schemas/Urgency'
+        urgencyOverridden:
+          type: boolean
+        draftReply:
+          type: string
+        status:
+          $ref: '#/components/schemas/TicketStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TicketEvent:
+      type: object
+      required: [id, ticketId, type, createdAt]
+      properties:
+        id:
+          type: string
+        ticketId:
+          type: string
+        type:
+          type: string
+          description: submitted | classified | drafted | urgency-overridden | draft-edited | approved | rejected
+        detail:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: integer
+          description: HTTP or application error code
+        message:
+          type: string
+          description: short human-readable label
+        description:
+          type: string
+          description: detailed explanation
+        moreInfo:
+          type: string
+          description: URI to documentation
+security:
+  - oauth2: []

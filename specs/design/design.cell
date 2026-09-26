@@ -1,0 +1,26 @@
+title Support Triage Agent
+
+component triage-webapp as "Support Triage Console" web-application
+component ticket-api as "Ticket API" service
+component triage-agent as "Triage Agent" ai-agent
+component tickets-db as "Tickets Database" database
+component triage-memory-db as "Triage Agent Memory" database
+
+east user-auth as "Thunder Auth" identity-server
+north ticket-source as "External Ticketing Systems" system
+
+north -> triage-webapp
+north -> ticket-api
+north -> triage-agent
+
+triage-webapp -> ticket-api
+triage-webapp -> user-auth
+
+ticket-source -> ticket-api
+
+ticket-api -> user-auth
+ticket-api -> triage-agent
+ticket-api -> tickets-db
+
+triage-agent -> user-auth
+triage-agent -> triage-memory-db

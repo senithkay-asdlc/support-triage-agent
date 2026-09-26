@@ -1,0 +1,18 @@
+{
+  "name": "ticket-api",
+  "type": "service",
+  "version": "0.1.0",
+  "language": "Ballerina",
+  "buildpack": "docker",
+  "appPath": "ticket-api",
+  "entrypoint": "deployment/service",
+  "exposure": "internet",
+  "dependencies": [
+    { "kind": "platform-resource", "name": "tickets-db", "resourceType": "postgres-cnpg" },
+    { "kind": "component", "name": "triage-agent", "description": "Classifies a newly-submitted ticket's urgency and drafts its reply, and drafts a fresh reply when a Support Agent rejects one." },
+    { "kind": "platform-resource", "name": "user-auth", "resourceType": "thunder-app" }
+  ],
+  "description": "Owns the ticket queue: accepts new tickets pushed by external ticketing systems on a public, credential-checked endpoint, calls triage-agent to classify urgency and draft a reply, and serves the protected queue/detail/approve/reject/override operations the Support Agent console calls. Records every state change as a ticket event for the audit history. Does not send the approved reply to the customer — that is another system's job — and holds no per-agent ticket assignment.",
+  "stories": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "skillsPinned": ["openapi-conventions", "ballerina", "api-management", "thunder-authentication"]
+}

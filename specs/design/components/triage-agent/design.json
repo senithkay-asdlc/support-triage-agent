@@ -1,0 +1,17 @@
+{
+  "name": "triage-agent",
+  "type": "ai-agent",
+  "version": "0.1.0",
+  "language": "TypeScript",
+  "buildpack": "docker",
+  "appPath": "triage-agent",
+  "entrypoint": "deployment/ai-agent",
+  "exposure": "internet",
+  "dependencies": [
+    { "kind": "platform-resource", "name": "triage-memory-db", "resourceType": "postgres-cnpg" },
+    { "kind": "platform-resource", "name": "user-auth", "resourceType": "thunder-app" }
+  ],
+  "description": "Given a ticket's subject and body, classifies its urgency (Low/Medium/High/Critical) and drafts a candidate reply. Called internally by ticket-api on ticket submission and again on rejection to produce a fresh draft. Calls no other component's API and holds no ticket data of its own beyond its conversation store.",
+  "stories": [2, 3],
+  "skillsPinned": ["agent-building"]
+}
